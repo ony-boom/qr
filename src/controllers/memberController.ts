@@ -166,10 +166,10 @@ export const getMember = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { id } = req.query;
+  const { id: mail } = req.query;
 
   try {
-    const [rows] = await pool.query("SELECT * FROM members WHERE id = ?", [id]);
+    const [rows] = await pool.query("SELECT * FROM members WHERE email = ?", [mail]);
 
     const memberInfo = rows as object[];
 
