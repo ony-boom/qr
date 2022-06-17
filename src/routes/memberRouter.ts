@@ -11,7 +11,8 @@ const router = Router();
 
 router
   .route("/")
-  .get(checkQuery, getMember)
   .post(checkBody, createMember)
   .put(checkBody, updateMemberPoints);
+
+router.get("/:id", checkQuery, getMember);
 export default router;
