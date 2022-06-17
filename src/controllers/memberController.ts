@@ -169,13 +169,13 @@ export const getMember = async (
   const { id: mail } = req.query;
 
   try {
-    const [rows] = await pool.query("SELECT * FROM members WHERE email = ?", [mail]);
+    const rows = await pool.query("SELECT * FROM members WHERE email = ?", [mail]);
 
-    const memberInfo = rows as object[];
+    const memberInfo = rows[0] as IdDataResult[];
 
     const response: ResponseForm<object> = {
       status: "Success",
-      message: "Member Points Updated",
+      message: "",
       data: memberInfo[0],
     };
     res.status(200).json(response);
