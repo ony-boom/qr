@@ -29,5 +29,6 @@
   },
   "scripts": {
     "dev": "nodemon ./dist/server.js",
+    "start": "tsc && node ./dist/server.js"
   }
 }
