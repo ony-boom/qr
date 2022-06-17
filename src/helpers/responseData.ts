@@ -1,7 +1,10 @@
-interface ResponseForm<T> {
+export interface ResponseForm<T> {
   status: string;
   message?: string;
   data: T;
 }
 
-export default ResponseForm;
+export interface IdDataResult {
+  id: string;
+  points: number;
+}

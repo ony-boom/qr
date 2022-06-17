@@ -1,8 +1,17 @@
 import { Router } from "express";
-import { createMember } from './../controllers/memberController';
+import {
+  createMember,
+  checkBody,
+  updateMemberPoints,
+  checkQuery,
+  getMember,
+} from "../controllers/memberController";
 
 const router = Router();
 
-router.route('/').post(createMember);
-
+router
+  .route("/")
+  .get(checkQuery, getMember)
+  .post(checkBody, createMember)
+  .put(checkBody, updateMemberPoints);
 export default router;
