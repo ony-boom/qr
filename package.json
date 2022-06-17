@@ -29,6 +29,6 @@
   },
   "scripts": {
     "dev": "nodemon ./dist/server.js",
-    "start": "node server.js"
+    "start": "node ./dist/server.js"
   }
 }
