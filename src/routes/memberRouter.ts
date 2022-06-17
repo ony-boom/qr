@@ -14,5 +14,5 @@ router
   .post(checkBody, createMember)
   .put(checkBody, updateMemberPoints);
 
-router.get("/:id", checkQuery, getMember);
+router.get("/:mail", checkQuery, getMember);
 export default router;

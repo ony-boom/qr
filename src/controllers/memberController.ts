@@ -166,7 +166,7 @@ export const getMember = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { id: mail } = req.query;
+  const { mail } = req.params;
 
   try {
     const rows = await pool.query("SELECT * FROM members WHERE email = ?", [mail]);
