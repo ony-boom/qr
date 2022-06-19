@@ -69,13 +69,13 @@ const checkBody = (req, res, next) => {
             check = req.body.email;
             break;
         case "put":
-            check = req.body.id;
+            check = req.body.email;
             break;
     }
     if (!check) {
         const response = {
             status: "Failed",
-            message: "Please Provide an ID",
+            message: "Please Provide an email",
             data: null,
         };
         return res.status(400).json(response);
@@ -99,7 +99,7 @@ exports.checkQuery = checkQuery;
 const updateMemberPoints = async (req, res, next) => {
     const { email } = req.body;
     try {
-        const rows = await db_1.default.query("SELECT id, points FROM members WHERE email = ?", [email]);
+        const rows = await db_1.default.query("SELECT email, points FROM members WHERE email = ?", [email]);
         const member = rows[0];
         if (member.length > 0) {
             member[0].points = Number(member[0].points) + 1;

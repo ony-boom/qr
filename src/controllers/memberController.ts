@@ -87,14 +87,14 @@ export const checkBody = (req: Request, res: Response, next: NextFunction) => {
       check = req.body.email;
       break;
     case "put":
-      check = req.body.id;
+      check = req.body.email;
       break;
   }
 
   if (!check) {
     const response: ResponseForm<null> = {
       status: "Failed",
-      message: "Please Provide an ID",
+      message: "Please Provide an email",
       data: null,
     };
     return res.status(400).json(response);
@@ -126,7 +126,7 @@ export const updateMemberPoints = async (
 
   try {
     const rows = await pool.query(
-      "SELECT id, points FROM members WHERE email = ?",
+      "SELECT email, points FROM members WHERE email = ?",
       [email]
     );
     const member = rows[0] as IdDataResult[];
