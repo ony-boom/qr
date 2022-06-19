@@ -97,14 +97,14 @@ const checkQuery = (req, res, next) => {
 };
 exports.checkQuery = checkQuery;
 const updateMemberPoints = async (req, res, next) => {
-    const { id } = req.body;
+    const { email } = req.body;
     try {
-        const rows = await db_1.default.query("SELECT id, points FROM members WHERE id = ?", [id]);
+        const rows = await db_1.default.query("SELECT id, points FROM members WHERE email = ?", [email]);
         const member = rows[0];
         if (member.length > 0) {
             member[0].points = Number(member[0].points) + 1;
             const newPoints = member[0].points;
-            const [info] = await db_1.default.query("UPDATE members SET points = ? WHERE id = ?", [newPoints, id]);
+            const [info] = await db_1.default.query("UPDATE members SET points = ? WHERE email = ?", [newPoints, email]);
             if (info.affectedRows) {
                 const response = {
                     status: "Success",

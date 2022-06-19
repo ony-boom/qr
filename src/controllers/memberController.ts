@@ -122,12 +122,12 @@ export const updateMemberPoints = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { id } = req.body;
+  const { email } = req.body;
 
   try {
     const rows = await pool.query(
-      "SELECT id, points FROM members WHERE id = ?",
-      [id]
+      "SELECT id, points FROM members WHERE email = ?",
+      [email]
     );
     const member = rows[0] as IdDataResult[];
 
@@ -136,8 +136,8 @@ export const updateMemberPoints = async (
       const newPoints = member[0].points;
 
       const [info] = await pool.query<ResultSetHeader>(
-        "UPDATE members SET points = ? WHERE id = ?",
-        [newPoints, id]
+        "UPDATE members SET points = ? WHERE email = ?",
+        [newPoints, email]
       );
 
       if (info.affectedRows) {
