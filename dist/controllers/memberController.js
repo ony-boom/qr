@@ -69,13 +69,13 @@ const checkBody = (req, res, next) => {
             check = req.body.email;
             break;
         case "put":
-            check = req.body.email;
+            check = req.body.id;
             break;
     }
     if (!check) {
         const response = {
             status: "Failed",
-            message: "Please Provide an email",
+            message: "Please Provide an ID by scanning you're QR Code",
             data: null,
         };
         return res.status(400).json(response);
@@ -97,14 +97,14 @@ const checkQuery = (req, res, next) => {
 };
 exports.checkQuery = checkQuery;
 const updateMemberPoints = async (req, res, next) => {
-    const { email } = req.body;
+    const { id } = req.body;
     try {
-        const rows = await db_1.default.query("SELECT email, points FROM members WHERE email = ?", [email]);
+        const rows = await db_1.default.query("SELECT id, points FROM members WHERE id = ?", [id]);
         const member = rows[0];
         if (member.length > 0) {
             member[0].points = Number(member[0].points) + 1;
             const newPoints = member[0].points;
-            const [info] = await db_1.default.query("UPDATE members SET points = ? WHERE email = ?", [newPoints, email]);
+            const [info] = await db_1.default.query("UPDATE members SET points = ? WHERE id = ?", [newPoints, id]);
             if (info.affectedRows) {
                 const response = {
                     status: "Success",
@@ -129,7 +129,7 @@ exports.updateMemberPoints = updateMemberPoints;
 const getMember = async (req, res, next) => {
     const { mail } = req.params;
     try {
-        const rows = await db_1.default.query("SELECT * FROM members WHERE email = ?", [mail]);
+        const rows = await db_1.default.query("SELECT first_name, last_name, email, points, phone FROM members WHERE email = ?", [mail]);
         const memberInfo = rows[0];
         const response = {
             status: "Success",

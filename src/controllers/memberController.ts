@@ -87,14 +87,14 @@ export const checkBody = (req: Request, res: Response, next: NextFunction) => {
       check = req.body.email;
       break;
     case "put":
-      check = req.body.email;
+      check = req.body.id;
       break;
   }
 
   if (!check) {
     const response: ResponseForm<null> = {
       status: "Failed",
-      message: "Please Provide an email",
+      message: "Please Provide an ID by scanning you're QR Code",
       data: null,
     };
     return res.status(400).json(response);
@@ -122,12 +122,12 @@ export const updateMemberPoints = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { email } = req.body;
+  const { id } = req.body;
 
   try {
     const rows = await pool.query(
-      "SELECT email, points FROM members WHERE email = ?",
-      [email]
+      "SELECT id, points FROM members WHERE id = ?",
+      [id]
     );
     const member = rows[0] as IdDataResult[];
 
@@ -136,8 +136,8 @@ export const updateMemberPoints = async (
       const newPoints = member[0].points;
 
       const [info] = await pool.query<ResultSetHeader>(
-        "UPDATE members SET points = ? WHERE email = ?",
-        [newPoints, email]
+        "UPDATE members SET points = ? WHERE id = ?",
+        [newPoints, id]
       );
 
       if (info.affectedRows) {
@@ -169,7 +169,10 @@ export const getMember = async (
   const { mail } = req.params;
 
   try {
-    const rows = await pool.query("SELECT * FROM members WHERE email = ?", [mail]);
+    const rows = await pool.query(
+      "SELECT first_name, last_name, email, points, phone FROM members WHERE email = ?",
+      [mail]
+    );
 
     const memberInfo = rows[0] as IdDataResult[];
 
