@@ -8,6 +8,7 @@ const qrcode_1 = __importDefault(require("qrcode"));
 const uuid_1 = require("uuid");
 const db_1 = __importDefault(require("../config/db"));
 const mailAPI_1 = __importDefault(require("../helpers/mailAPI"));
+const isValidCredentials_1 = __importDefault(require("../helpers/isValidCredentials"));
 const sendMail = async (to, content, member) => {
     let sent = false;
     const [memberLastName] = member.split(" ");
@@ -62,23 +63,30 @@ const createMember = async (req, res, next) => {
     next();
 };
 exports.createMember = createMember;
-const checkBody = (req, res, next) => {
+const checkBody = async (req, res, next) => {
     let check = "";
+    let cred = "email";
+    let isValid = true;
+    let status = 400;
     switch (req.method.toLowerCase()) {
         case "post":
             check = req.body.email;
+            cred = "email";
             break;
         case "put":
             check = req.body.id;
+            cred = "id";
+            isValid = await (0, isValidCredentials_1.default)(cred, check);
+            status = isValid ? 200 : 404;
             break;
     }
-    if (!check) {
+    if (!check || !isValid) {
         const response = {
             status: "Failed",
-            message: "Please Provide an ID by scanning you're QR Code",
+            message: "Please Provide a valid " + cred,
             data: null,
         };
-        return res.status(400).json(response);
+        return res.status(status).json(response);
     }
     next();
 };
@@ -88,7 +96,7 @@ const checkQuery = (req, res, next) => {
     if (!query) {
         const response = {
             status: "Failed",
-            message: "Please Provide an ID",
+            message: "Please Provide a valid ID",
             data: null,
         };
         return res.status(400).json(response);

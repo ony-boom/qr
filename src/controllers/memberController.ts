@@ -6,6 +6,7 @@ import { ResultSetHeader } from "mysql2";
 import { ResponseForm, IdDataResult } from "../helpers/responseData";
 import pool from "../config/db";
 import createTransporter from "../helpers/mailAPI";
+import isValidCredentials, { Credential } from "../helpers/isValidCredentials";
 
 const sendMail = async (
   to: string,
@@ -79,25 +80,32 @@ export const createMember = async (
   next();
 };
 
-export const checkBody = (req: Request, res: Response, next: NextFunction) => {
+export const checkBody = async (req: Request, res: Response, next: NextFunction) => {
   let check = "";
+  let cred: Credential = "email";
+  let isValid = true;
+  let status = 400;
 
   switch (req.method.toLowerCase()) {
     case "post":
       check = req.body.email;
+      cred = "email";
       break;
     case "put":
       check = req.body.id;
+      cred = "id";
+      isValid = await isValidCredentials(cred, check);
+      status = isValid ? 200 : 404;
       break;
   }
 
-  if (!check) {
+  if (!check || !isValid) {
     const response: ResponseForm<null> = {
       status: "Failed",
-      message: "Please Provide an ID by scanning you're QR Code",
+      message: "Please Provide a valid " + cred,
       data: null,
     };
-    return res.status(400).json(response);
+    return res.status(status).json(response);
   }
 
   next();
@@ -109,7 +117,7 @@ export const checkQuery = (req: Request, res: Response, next: NextFunction) => {
   if (!query) {
     const response: ResponseForm<null> = {
       status: "Failed",
-      message: "Please Provide an ID",
+      message: "Please Provide a valid ID",
       data: null,
     };
     return res.status(400).json(response);
