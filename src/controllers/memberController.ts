@@ -80,44 +80,69 @@ export const createMember = async (
   next();
 };
 
-export const checkBody = async (req: Request, res: Response, next: NextFunction) => {
+export const validate = async (req: Request, res: Response, next: NextFunction) => {
+  let cred: Credential = "id";
+  let value: string = "";
+  let valid = false;
+
+  switch (req.method.toLowerCase()) {
+    case "put":
+      cred = "id";
+      value = req.body.id;
+      break;
+    case "get":
+      cred = "email";
+      value = req.params.email;
+      break;
+  }
+  valid = await isValidCredentials(cred, value);
+  if (!valid) {
+    const response: ResponseForm<null> = {
+      status: "Failed",
+      message: "Member not found, Please Provide a valid " + cred,
+      data: null,
+    };
+    return res.status(404).json(response);
+  }
+
+  next();
+};
+
+export const checkBody = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   let check = "";
-  let cred: Credential = "email";
-  let isValid = true;
-  let status = 400;
 
   switch (req.method.toLowerCase()) {
     case "post":
       check = req.body.email;
-      cred = "email";
       break;
     case "put":
       check = req.body.id;
-      cred = "id";
-      isValid = await isValidCredentials(cred, check);
-      status = isValid ? 200 : 404;
       break;
   }
 
-  if (!check || !isValid) {
+  if (!check) {
     const response: ResponseForm<null> = {
       status: "Failed",
-      message: "Please Provide a valid " + cred,
+      message: "Please Provide a valid credentials",
       data: null,
     };
-    return res.status(status).json(response);
+    return res.status(400).json(response);
   }
 
   next();
 };
 
 export const checkQuery = (req: Request, res: Response, next: NextFunction) => {
-  const query = req.query;
+  const { email } = req.params;
 
-  if (!query) {
+  if (!email) {
     const response: ResponseForm<null> = {
       status: "Failed",
-      message: "Please Provide a valid ID",
+      message: "Please Provide a valid mail",
       data: null,
     };
     return res.status(400).json(response);
@@ -174,19 +199,19 @@ export const getMember = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { mail } = req.params;
+  const { email } = req.params;
 
   try {
     const rows = await pool.query(
       "SELECT first_name, last_name, email, points, phone FROM members WHERE email = ?",
-      [mail]
+      [email]
     );
 
     const memberInfo = rows[0] as IdDataResult[];
 
     const response: ResponseForm<object> = {
       status: "Success",
-      message: "",
+      message: "Member found",
       data: memberInfo[0],
     };
     res.status(200).json(response);

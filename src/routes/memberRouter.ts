@@ -5,6 +5,7 @@ import {
   updateMemberPoints,
   checkQuery,
   getMember,
+  validate
 } from "../controllers/memberController";
 
 const router = Router();
@@ -12,7 +13,8 @@ const router = Router();
 router
   .route("/")
   .post(checkBody, createMember)
-  .put(checkBody, updateMemberPoints);
+  .put( checkBody, validate, updateMemberPoints);
 
-router.get("/:mail", checkQuery, getMember);
+router.get("/:email", checkQuery, validate, getMember);
+
 export default router;

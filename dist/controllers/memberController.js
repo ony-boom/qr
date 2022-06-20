@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getMember = exports.updateMemberPoints = exports.checkQuery = exports.checkBody = exports.createMember = void 0;
+exports.getMember = exports.updateMemberPoints = exports.checkQuery = exports.checkBody = exports.validate = exports.createMember = void 0;
 const qrcode_1 = __importDefault(require("qrcode"));
 const uuid_1 = require("uuid");
 const db_1 = __importDefault(require("../config/db"));
@@ -63,40 +63,59 @@ const createMember = async (req, res, next) => {
     next();
 };
 exports.createMember = createMember;
+const validate = async (req, res, next) => {
+    let cred = "id";
+    let value = "";
+    let valid = false;
+    switch (req.method.toLowerCase()) {
+        case "put":
+            cred = "id";
+            value = req.body.id;
+            break;
+        case "get":
+            cred = "email";
+            value = req.params.email;
+            break;
+    }
+    valid = await (0, isValidCredentials_1.default)(cred, value);
+    if (!valid) {
+        const response = {
+            status: "Failed",
+            message: "Member not found, Please Provide a valid " + cred,
+            data: null,
+        };
+        return res.status(404).json(response);
+    }
+    next();
+};
+exports.validate = validate;
 const checkBody = async (req, res, next) => {
     let check = "";
-    let cred = "email";
-    let isValid = true;
-    let status = 400;
     switch (req.method.toLowerCase()) {
         case "post":
             check = req.body.email;
-            cred = "email";
             break;
         case "put":
             check = req.body.id;
-            cred = "id";
-            isValid = await (0, isValidCredentials_1.default)(cred, check);
-            status = isValid ? 200 : 404;
             break;
     }
-    if (!check || !isValid) {
+    if (!check) {
         const response = {
             status: "Failed",
-            message: "Please Provide a valid " + cred,
+            message: "Please Provide a valid credentials",
             data: null,
         };
-        return res.status(status).json(response);
+        return res.status(400).json(response);
     }
     next();
 };
 exports.checkBody = checkBody;
 const checkQuery = (req, res, next) => {
-    const query = req.query;
-    if (!query) {
+    const { email } = req.params;
+    if (!email) {
         const response = {
             status: "Failed",
-            message: "Please Provide a valid ID",
+            message: "Please Provide a valid mail",
             data: null,
         };
         return res.status(400).json(response);
@@ -135,13 +154,13 @@ const updateMemberPoints = async (req, res, next) => {
 };
 exports.updateMemberPoints = updateMemberPoints;
 const getMember = async (req, res, next) => {
-    const { mail } = req.params;
+    const { email } = req.params;
     try {
-        const rows = await db_1.default.query("SELECT first_name, last_name, email, points, phone FROM members WHERE email = ?", [mail]);
+        const rows = await db_1.default.query("SELECT first_name, last_name, email, points, phone FROM members WHERE email = ?", [email]);
         const memberInfo = rows[0];
         const response = {
             status: "Success",
-            message: "",
+            message: "Member found",
             data: memberInfo[0],
         };
         res.status(200).json(response);

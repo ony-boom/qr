@@ -6,6 +6,6 @@ const router = (0, express_1.Router)();
 router
     .route("/")
     .post(memberController_1.checkBody, memberController_1.createMember)
-    .put(memberController_1.checkBody, memberController_1.updateMemberPoints);
-router.get("/:mail", memberController_1.checkQuery, memberController_1.getMember);
+    .put(memberController_1.checkBody, memberController_1.validate, memberController_1.updateMemberPoints);
+router.get("/:email", memberController_1.checkQuery, memberController_1.validate, memberController_1.getMember);
 exports.default = router;
