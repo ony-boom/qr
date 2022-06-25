@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getMember = exports.updateMemberPoints = exports.checkQuery = exports.checkBody = exports.validate = exports.createMember = void 0;
+exports.getAllMember = exports.getMember = exports.updateMemberPoints = exports.checkQuery = exports.checkBody = exports.validate = exports.createMember = void 0;
 const qrcode_1 = __importDefault(require("qrcode"));
 const uuid_1 = require("uuid");
 const db_1 = __importDefault(require("../config/db"));
@@ -12,25 +12,20 @@ const isValidCredentials_1 = __importDefault(require("../helpers/isValidCredenti
 const sendMail = async (to, content, member) => {
     let sent = false;
     const [memberLastName] = member.split(" ");
-    try {
-        const transporter = await (0, mailAPI_1.default)();
-        const info = await transporter.sendMail({
-            from: `Ony <${process.env.MAIL_USER}>`,
-            to,
-            subject: "QR member code",
-            text: "Howdy " + memberLastName + " !" + "\n This is you're QR Code",
-            attachments: [
-                {
-                    path: content,
-                },
-            ],
-        });
-        if (info.messageId) {
-            sent = true;
-        }
-    }
-    catch (error) {
-        throw error;
+    const transporter = await (0, mailAPI_1.default)();
+    const info = await transporter.sendMail({
+        from: `Ony <${process.env.MAIL_USER}>`,
+        to,
+        subject: "QR member code",
+        text: "Howdy " + memberLastName + " !" + "\n This is you're QR Code",
+        attachments: [
+            {
+                path: content,
+            },
+        ],
+    });
+    if (info.messageId) {
+        sent = true;
     }
     return sent;
 };
@@ -176,3 +171,14 @@ const getMember = async (req, res, next) => {
     next();
 };
 exports.getMember = getMember;
+const getAllMember = async (_, res, next) => {
+    const [rows] = await db_1.default.query("SELECT first_name, last_name, points, email FROM members");
+    const response = {
+        status: "Success",
+        message: "Members",
+        data: rows,
+    };
+    res.status(200).json(response);
+    next();
+};
+exports.getAllMember = getAllMember;

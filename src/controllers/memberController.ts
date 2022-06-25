@@ -17,26 +17,22 @@ const sendMail = async (
 
   const [memberLastName] = member.split(" ");
 
-  try {
-    const transporter = await createTransporter();
+  const transporter = await createTransporter();
 
-    const info = await transporter.sendMail({
-      from: `Ony <${process.env.MAIL_USER}>`,
-      to,
-      subject: "QR member code",
-      text: "Howdy " + memberLastName + " !" + "\n This is you're QR Code",
-      attachments: [
-        {
-          path: content,
-        },
-      ],
-    });
+  const info = await transporter.sendMail({
+    from: `Ony <${process.env.MAIL_USER}>`,
+    to,
+    subject: "QR member code",
+    text: "Howdy " + memberLastName + " !" + "\n This is you're QR Code",
+    attachments: [
+      {
+        path: content,
+      },
+    ],
+  });
 
-    if (info.messageId) {
-      sent = true;
-    }
-  } catch (error) {
-    throw error;
+  if (info.messageId) {
+    sent = true;
   }
 
   return sent;
@@ -80,9 +76,13 @@ export const createMember = async (
   next();
 };
 
-export const validate = async (req: Request, res: Response, next: NextFunction) => {
+export const validate = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   let cred: Credential = "id";
-  let value: string = "";
+  let value = "";
   let valid = false;
 
   switch (req.method.toLowerCase()) {
@@ -225,3 +225,16 @@ export const getMember = async (
   }
   next();
 };
+
+export const getAllMember = async (_: Request, res: Response, next: NextFunction) => {
+    const [rows] = await pool.query("SELECT first_name, last_name, points, email FROM members");
+    
+    const response: ResponseForm<object> = {
+      status: "Success",
+      message: "Members",
+      data: rows,
+    };
+
+    res.status(200).json(response);
+    next();
+}
