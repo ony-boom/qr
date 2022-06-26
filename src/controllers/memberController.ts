@@ -203,7 +203,7 @@ export const getMember = async (
 
   try {
     const rows = await pool.query(
-      "SELECT first_name, last_name, email, points, phone FROM members WHERE email = ?",
+      "SELECT first_name, last_name, email, points, phone, qr_code FROM members WHERE email = ?",
       [email]
     );
 

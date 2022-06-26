@@ -151,7 +151,7 @@ exports.updateMemberPoints = updateMemberPoints;
 const getMember = async (req, res, next) => {
     const { email } = req.params;
     try {
-        const rows = await db_1.default.query("SELECT first_name, last_name, email, points, phone FROM members WHERE email = ?", [email]);
+        const rows = await db_1.default.query("SELECT first_name, last_name, email, points, phone, qr_code FROM members WHERE email = ?", [email]);
         const memberInfo = rows[0];
         const response = {
             status: "Success",
