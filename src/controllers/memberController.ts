@@ -157,13 +157,12 @@ export const updateMemberPoints = async (
 ) => {
   const { id } = req.body;
 
-  try {
-    const rows = await pool.query(
-      "SELECT id, points FROM members WHERE id = ?",
-      [id]
-    );
-    const member = rows[0] as IdDataResult[];
+  const rows = await pool.query("SELECT id, points FROM members WHERE id = ?", [
+    id,
+  ]);
+  const member = rows[0] as IdDataResult[];
 
+  try {
     if (member.length > 0) {
       member[0].points = Number(member[0].points) + 1;
       const newPoints = member[0].points;
@@ -182,7 +181,7 @@ export const updateMemberPoints = async (
         res.status(200).json(response);
       }
     }
-  } catch (e) {
+  } catch (err) {
     const response: ResponseForm<null> = {
       status: "error",
       message: "Server Error",
@@ -190,7 +189,6 @@ export const updateMemberPoints = async (
     };
     res.status(500).json(response);
   }
-
   next();
 };
 
@@ -206,7 +204,6 @@ export const getMember = async (
       "SELECT first_name, last_name, email, points, phone, qr_code FROM members WHERE email = ?",
       [email]
     );
-
     const memberInfo = rows[0] as IdDataResult[];
 
     const response: ResponseForm<object> = {
@@ -226,15 +223,22 @@ export const getMember = async (
   next();
 };
 
-export const getAllMember = async (_: Request, res: Response, next: NextFunction) => {
-    const [rows] = await pool.query("SELECT first_name, last_name, points, email FROM members");
-    
-    const response: ResponseForm<object> = {
-      status: "Success",
-      message: "Members",
-      data: rows,
-    };
+export const getAllMember = async (
+  _: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const [rows] = await pool.query(
+    "SELECT first_name, last_name, points, email FROM members"
+  );
 
-    res.status(200).json(response);
-    next();
-}
+  const response: ResponseForm<object> = {
+    status: "Success",
+    message: "Members",
+    data: rows,
+  };
+
+  res.status(200).json(response);
+  next();
+};
+

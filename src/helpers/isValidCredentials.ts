@@ -1,4 +1,4 @@
-import { ResultSetHeader } from "mysql2";
+// import { ResultSetHeader } from "mysql2";
 import pool from "../config/db";
 
 export type Credential = "email" | "id";
