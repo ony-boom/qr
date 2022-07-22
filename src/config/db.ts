@@ -1,15 +1,8 @@
-import mysql from 'mysql2';
+import {connect} from "mongoose";
+const DB_URI = process.env.DB_URI || "mongodb://localhost:27017/qr";
 
-const dbOption: mysql.PoolOptions = {
-    // host: process.env.DB_HOST,
-    // user: process.env.DB_USER,
-    // password: process.env.DB_PASSWORD,
-    // database: process.env.DB_NAME,
-    // port: process.env.NODE_ENV === "development" ? 3306 : Number(process.env.DB_PORT)
-    uri: process.env.DB_URI
+async function connecDb () {
+    await connect(DB_URI);
 }
 
-export const pool = mysql.createPool(dbOption);
-// promised pool
-const promisePool = pool.promise();
-export default promisePool;
+export default connecDb;

@@ -1,7 +1,15 @@
 import dotenv from "dotenv";
+import connectDb from "./config/db";
+import app from "./app";
 dotenv.config();
 
-import app from "./app";
+connectDb()
+  .catch((err) => {
+    throw err;
+  })
+  .then(() => {
+    console.log("db connection ok");
+  });
 
 const PORT = process.env.PORT || 8000;
 

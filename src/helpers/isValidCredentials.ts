@@ -1,24 +1,14 @@
-// import { ResultSetHeader } from "mysql2";
-import pool from "../config/db";
+import Member from "../models/member";
 
-export type Credential = "email" | "id";
+export type Credential = "email" | "_id";
 
 const isValidCredentials = async (
   credential: Credential,
   value: string
 ): Promise<boolean> => {
   let isValid = false;
-  const [rows] = await pool.query(
-    `SELECT ${credential} FROM members WHERE ${credential} = ?`,
-    [value]
-  );
-
-  const result = <any[]>rows;
-
-  if (result.length > 0) {
-    isValid = true;
-  }
-  
+  const result = await Member.findOne({ [credential]: value });
+  if (result) isValid = true;
   return isValid;
 };
 
